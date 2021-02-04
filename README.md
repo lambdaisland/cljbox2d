@@ -8,7 +8,15 @@ Idiomatic and cross-platform Clojure version of the Box2D physics engine API. Wr
 
 Created for use with Quil, but can be used independently.
 
-Work in progress. The Clojure/JVM version is largely there, the ClojureScript version has only just started.
+Work in progress. See the demo directory for examples.
+
+## Writing portable code
+
+The following jBox2D features are not supported by planck.js
+
+- ConstantVolumeJoin
+- Particles (and thus particle raycast)
+
 
 ## License
 
