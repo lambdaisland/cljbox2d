@@ -14,9 +14,9 @@
 
 (def tile-set (e/load-grid tile-path {:width 16 :height 16 :scale 4}))
 (def fireball-tiles (e/load-grid fireball-path {:width 67
-                                                :height 8
+                                                :height 9
                                                 :pad-x 1
-                                                :pad-y 1
+                                                :pad-y 0
                                                 :scale 4}))
 
 (def monster (e/tile-sequence tile-set [1 20 2 2] 8))
@@ -104,13 +104,13 @@
 (defn shoot-fire! []
   (let [bullets (seq (b/find-all-by world :type :bullet))]
     (when (or (not bullets)
-              (< 200 (- (millis) (apply max (map (comp :start-time deref) bullets)))))
+              (< 300 (- (millis) (apply max (map (comp :start-time deref) bullets)))))
       (let [player (b/find-by world :id ::player)
             [x y] (b/world-center player)
             {:keys [flipped?]} @player]
         (b/add-body world
                     {:position [((if flipped? - +) x 2) y]
-                     :linear-velocity (if flipped? [-5 0] [5 0])
+                     :linear-velocity (if flipped? [-7 0] [7 0])
                      :type :kinematic
                      :bullet? true
                      :draw draw-bullet
@@ -141,7 +141,7 @@
 (defn clean-up-bullets []
   (let [now (millis)]
     (doseq [b (b/find-all-by world :type :bullet)]
-      (when (< 2000 (- now (:start-time @b)))
+      (when (< 1200 (- now (:start-time @b)))
         (b/destroy world b)))))
 
 (defn draw []
