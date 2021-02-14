@@ -1,6 +1,7 @@
 (ns lambdaisland.cljbox2d.quil
   (:require [lambdaisland.cljbox2d :as b]
             [lambdaisland.cljbox2d.camera :as camera]
+            [lambdaisland.cljbox2d.math :as math]
             [quil.core :as q])
   #?(:clj (:import (org.jbox2d.collision.shapes Shape
                                                 ShapeType
@@ -83,7 +84,7 @@
   PolygonShape
   (draw-shape! [shape body]
     (q/begin-shape)
-    (let [vs (map (partial b/world->screen) (b/world-vertices body shape))]
+    (let [vs (map b/world->screen (b/world-vertices body shape))]
       (doseq [[^double x ^double y] vs]
         (q/vertex x y))
       (let [[^double x ^double y] (first vs)]
@@ -99,9 +100,12 @@
           scale-y (.-y (.-ey matrix))
           #_#_[^double scale-x ^double scale-y] (svd/get-scale matrix)]
       (q/push-matrix)
-      (q/rotate (camera/mat-angle matrix))
+      (q/rotate (math/mat-angle matrix))
       (q/ellipse x y (* scale-x radius 2) (* scale-y radius 2))
       (q/pop-matrix)))
 
-
-  )
+  EdgeShape
+  (draw-shape! [shape body]
+    (let [[[x1 y1] [x2 y2]] (map b/world->screen (b/world-vertices body shape))]
+      #_(prn [x1 y1] [x2 y2])
+      (q/line x1 y1 x2 y2))))

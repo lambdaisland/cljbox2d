@@ -6,14 +6,15 @@
   cljs-bean/cljs-bean              {:mvn/version "1.6.0"}
   applied-science/js-interop       {:mvn/version "0.2.7"}
   mhuebert/kitchen-async           {:mvn/version "0.1.0"}
-  lambdaisland/jbox2d-library      {:mvn/version "2.3.1.750"}
+  lambdaisland/jbox2d-library      {:mvn/version "2.3.1.756"}
   org.apache.commons/commons-math3 {:mvn/version "3.2"}}
 
  :aliases
  {:dev
   {:extra-paths ["dev" "demo"]
-   :extra-deps  {thheller/shadow-cljs {:mvn/version "2.11.14"}
-                 quil/quil            {:mvn/version "3.1.0"}}}
+   :extra-deps  {thheller/shadow-cljs             {:mvn/version "2.11.14"}
+                 quil/quil                        {:mvn/version "3.1.0"}
+                 lambdaisland/jbox2d-testbed-jogl {:mvn/version "2.3.1.756"}}}
 
   :test
   {:extra-paths ["test"]

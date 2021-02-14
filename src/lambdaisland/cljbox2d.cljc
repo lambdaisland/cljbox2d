@@ -1,10 +1,13 @@
 (ns lambdaisland.cljbox2d
   (:require [lambdaisland.cljbox2d.data-printer :as data-printer]
-            [lambdaisland.cljbox2d.camera :as camera])
+            [lambdaisland.cljbox2d.camera :as camera]
+            [lambdaisland.cljbox2d.math :as math])
   #?(:clj (:require [lambdaisland.cljbox2d.svd :as svd])
      :cljs (:require ["planck-js" :as planck]
                      ["planck-js/lib/common/Vec2" :as Vec2]
                      ["planck-js/lib/common/Mat22" :as Mat22]
+                     ["planck-js/lib/common/Transform" :as Transform]
+                     ["planck-js/lib/common/Rot" :as Rot]
                      ["planck-js/lib/World" :as World]
                      ["planck-js/lib/Body" :as Body]
                      ["planck-js/lib/Fixture" :as Fixture]
@@ -33,7 +36,7 @@
                                            EdgeShape
                                            PolygonShape
                                            ChainShape)
-              (org.jbox2d.common Vec2 Mat22 OBBViewportTransform)
+              (org.jbox2d.common Vec2 Mat22 Transform OBBViewportTransform Rot)
               (org.jbox2d.dynamics World
                                    Body
                                    BodyDef
@@ -41,6 +44,7 @@
                                    Filter
                                    Fixture
                                    FixtureDef)
+              (org.jbox2d.dynamics.contacts Contact)
               (org.jbox2d.dynamics.joints ConstantVolumeJointDef
                                           DistanceJointDef
                                           FrictionJointDef
@@ -57,7 +61,8 @@
                                           WheelJointDef)
               (org.jbox2d.callbacks RayCastCallback
                                     ParticleRaycastCallback
-                                    QueryCallback))))
+                                    QueryCallback
+                                    ContactListener))))
 
 #?(:clj
    (do
@@ -89,20 +94,24 @@
   (friction [_])
   (sensor? [_])
   (restitution [_])
-  (transform [_])
+  (transform ^Mat22 [_])
   (fixed-rotation? [_])
   (bullet? [_])
-  (radius [_]))
+  (radius [_])
+  (awake? [_])
+  (linear-velocity [_])
+  (angular-velocity [_])
+  (world-center [_]))
 
 (defprotocol IOperations
   (move-to! [_ v])
   (move-by! [_ v])
-  (zoom! [_ f])
+  (zoom*! [_ f])
   (ctl1! [entity k v] "Generically control properties")
   (alter-user-data*! [entity f args])
   (apply-force! [_ force] [_ force point])
   (apply-torque! [_ torque])
-  (apply-impulse! [_ impulse point wake?])
+  (apply-impulse! [_ impulse wake?] [_ impulse point wake?])
   (apply-angular-impulse! [_ impulse]))
 
 (defn alter-user-data! [entity f & args]
@@ -150,7 +159,15 @@
      :normals (into [] (take (.-m_count s) (.-m_normals s)))
      :radius (.getRadius s)
      :type (.getType s)
-     :vertices (vertices s)}))
+     :vertices (vertices s)})
+
+  Transform
+  (value [t]
+    [(.-p t) (.-q t)])
+  Rot
+  (value [r]
+    {:sin (.-s r)
+     :cos (.-c r)}))
 
 #?(:clj
    (extend-protocol IValue
@@ -191,6 +208,8 @@
 (data-printer/register-type-printer Body 'box2d/body value)
 (data-printer/register-type-printer PolygonShape 'box2d/polygon-shape value)
 (data-printer/register-type-printer Shape 'box2d/shape value)
+(data-printer/register-type-printer Transform 'box2d/transform value)
+(data-printer/register-type-printer Rot 'box2d/rot value)
 
 #?(:clj
    (do
@@ -228,8 +247,12 @@
 (defmethod make-shape :default [s] s)
 
 (defmethod make-shape :rect [[_ ^double width ^double height center angle]]
-  (if (and center angle)
+  (cond
+    (and center angle)
     (rectangle width height center angle)
+    center
+    (rectangle width height center 0)
+    :else
     (rectangle width height)))
 
 (defmethod make-shape :circle [[_ a b]]
@@ -243,8 +266,7 @@
 
 (defmethod make-shape :edge [[_ v1 v2]]
   (let [s (EdgeShape.)]
-    (set! (.-m_vertex1 s) (as-vec2 v1))
-    (set! (.-m_vertex2 s) (as-vec2 v2))
+    (#?(:clj .set :cljs ._set) s (as-vec2 v1) (as-vec2 v2))
     s))
 
 (defmethod make-shape :polygon [[_ & vs]]
@@ -491,8 +513,73 @@
     (set! (.-collideConnected j) (boolean collide-connected?))
     (end-joint-def type j)))
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;; Build world
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Listeners
+
+;; Some differences here between jBox2d and planck. The former only allows
+;; setting a single ContactListener, the latter has replaced the ContactListener
+;; with JavaScript style event registration (world.on("begin-contact",
+;; function(contact) {...})). We turn this into an interface that is more
+;; idiomatic for Clojure, allowing multiple listeners identified by keyword,
+;; similar to watches on an atom. This also makes them quite suitable for a REPL
+;; driven workflow, since it's easy to continuously replace a specific listener.
+
+(defn- dispatch-event [listeners event & args]
+  (doseq [f (vals (get @listeners event))]
+    (apply f args)))
+
+#?(:clj
+   (defrecord ContactListenerFanout [listeners
+                                     #_(atom {:begin-contact
+                                              {:my-key (fn [...])}})]
+     ContactListener
+     (beginContact [this contact]
+       (dispatch-event listeners :begin-contact contact))
+     (endContact [this contact]
+       (dispatch-event listeners :end-contact contact))
+     (preSolve [this contact old-manifold]
+       (dispatch-event listeners :pre-solve contact old-manifold))
+     (postSolve [this contact impulse]
+       (dispatch-event listeners :post-solve contact impulse))))
+
+(defn setup-listener-fanout! [^World world]
+  #?(:clj
+     (.setContactListener world (->ContactListenerFanout (atom {})))
+     :cljs
+     (let [listeners (atom {})]
+       (set! (.-CLJS_LISTENERS world) listeners)
+       (.on world "begin-contact" #(dispatch-event listeners :begin-contact %1))
+       (.on world "end-contact" #(dispatch-event listeners :end-contact %1))
+       (.on world "pre-solve" #(dispatch-event listeners :pre-solve %1 %2))
+       (.on world "post-solve" #(dispatch-event listeners :post-solve %1 %2)))))
+
+(defn listen!
+  "Listen for world events, `event` is one
+  of :begin-contact, :end-contact, :pre-solve, :post-solve. `key` is a key you
+  choose to identify this listener. Calling [[listen!]] again with the same
+  event+key will replace the old listener. The key can also be used
+  to [[unlisten!]]
+
+  Returns the world instance for easy threading."
+  [^World world event key f]
+  (swap! #?(:clj (:listeners (.. world getContactManager -m_contactListener))
+            :cljs (.-CLJS_LISTENERS world))
+         assoc-in
+         [event key]
+         f)
+  world)
+
+(defn unlisten!
+  "Remove a specific event listener"
+  [^World world event key]
+  (swap! #?(:clj (:listeners (.. world getContactManager -m_contactListener))
+            :cljs (.-CLJS_LISTENERS world))
+         update event
+         dissoc key)
+  world)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Build world
 
 (defn add-fixture
   ([^Body body f]
@@ -528,7 +615,10 @@
     (.createJoint world (joint-def props))))
 
 (defn world [gravity-x gravity-y]
-  (World. (vec2 gravity-x gravity-y)))
+  (let [world (World. (vec2 gravity-x gravity-y))]
+    (setup-listener-fanout! world)
+
+    world))
 
 (defn populate
   ([world bodies]
@@ -538,8 +628,16 @@
    (run! (partial add-joint world) joints)
    world))
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;; Use world
+(defn destroy [^World world object]
+  (cond
+    (instance? Joint object)
+    (.destroyJoint world ^Joint object))
+  (cond
+    (instance? Body object)
+    (.destroyBody world ^Joint object)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Use world
 
 (defn step-world
   ([world]
@@ -587,6 +685,28 @@
   ([^Body body fixture-or-shape]
    (let [vertices (vertices fixture-or-shape)]
      (map (partial world-point body) vertices))))
+
+(defn find-by
+  "Find a body or fixture with a given user-data property,
+  e.g. (find-by world :id :player)"
+  [container k v]
+  (if (sequential? container)
+    (some #(find-by % k v) container)
+    (reduce #(when (= (get (user-data %2) k) v)
+               (reduced %2))
+            nil
+            (concat (bodies container)
+                    (fixtures container)))))
+
+(defn find-all-by
+  "Find all bodies or fixtures with a given user-data property,
+  e.g. (find-by world :type :npc)"
+  [container k v]
+  (if (sequential? container)
+    (mapcat #(find-all-by % k v))
+    (filter (comp #{v} #(get % k) user-data)
+            (concat (bodies container)
+                    (fixtures container)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Querying
@@ -641,12 +761,40 @@
              point1 point2)
     (persistent! @result)))
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;; Properties and Operations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Properties and Operations
 
 (defn ctl! [entity & kvs]
   (doseq [[k v] (partition 2 kvs)]
     (ctl1! entity k v)))
+
+(defn zoom!
+  ([amount]
+   (zoom*! *camera* amount))
+  ([camera amount]
+   (zoom*! camera amount)))
+
+(defn pan!
+  ([x y]
+   (camera/pan! *camera* x y))
+  ([camera x y]
+   (camera/pan! camera x y)))
+
+(defn pan-x!
+  ([x]
+   (camera/pan-x! *camera* x))
+  ([camera x]
+   (camera/pan-x! camera x)))
+
+(defn pan-y!
+  ([y]
+   (camera/pan-y! *camera* y))
+  ([camera y]
+   (camera/pan-y! camera y)))
+
+(defn set-viewport! [x y scale]
+  (camera/pan! *camera* x y)
+  (camera/set-scale! *camera* scale))
 
 (extend-protocol IProperty
   World
@@ -669,6 +817,8 @@
     (.getAngle b))
   (position [b]
     (.getPosition b))
+  (bodies [b]
+    [b])
   (fixtures [b]
     (linked-list-seq (.getFixtureList b)))
   (vertices [b]
@@ -681,10 +831,22 @@
     (.isBullet b))
   (user-data [b]
     (.-m_userData b))
+  (awake? [b]
+    (.isAwake b))
+  (linear-velocity [b]
+    (.-m_linearVelocity b))
+  (angular-velocity [b]
+    (.-m_angularVelocity b))
+  (world-center [b]
+    (.getWorldCenter b))
 
   Fixture
   (body [f]
     (.-m_body f))
+  (bodies [f]
+    [(body f)])
+  (fixtures [f]
+    [f])
   (angle [f]
     (angle (body f)))
   (shape [f]
@@ -727,7 +889,7 @@
 
   EdgeShape
   (vertices [s]
-    [(.-m_vertex0 s) (.-m_vertex1 s)])
+    [(.-m_vertex1 s) (.-m_vertex2 s)])
   (centroid [s]
     (doto ^Vec2 (vec2 0 0)
       (.addLocal (.-m_vertex0 s))
@@ -746,7 +908,13 @@
 
   Joint
   (user-data [j]
-    (.-m_userData j)))
+    (.-m_userData j))
+
+  Contact
+  (fixtures [c]
+    [(.-m_fixtureA c) (.-m_fixtureB c)])
+  (bodies [c]
+    (map body (fixtures c))))
 
 (extend-protocol IOperations
   World
@@ -783,8 +951,11 @@
      (.applyForce b (as-vec2 force) (as-vec2 point))))
   (apply-torque! [b torque]
     (.applyTorque b torque))
-  (apply-impulse! [b impulse point wake?]
-    (.applyLinearImpulse b (as-vec2 impulse) (as-vec2 point) wake?))
+  (apply-impulse!
+    ([b impulse wake?]
+     (.applyLinearImpulse b (as-vec2 impulse) (.getWorldCenter b) wake?))
+    ([b impulse point wake?]
+     (.applyLinearImpulse b (as-vec2 impulse) (as-vec2 point) wake?)))
   (apply-angular-impulse! [b impulse]
     (.applyAngularImpulse b impulse))
 
@@ -793,12 +964,13 @@
     (.set ^Vec2 (.-center camera) (as-vec2 center))
     camera)
   (move-by! [camera offset]
-    (.set ^Vec2 (.-center camera) (camera/vec-add (.-center camera)
-                                                  (as-vec2 offset)))
+    (.set ^Vec2 (.-center camera) (math/vec-add (.-center camera)
+                                                (as-vec2 offset)))
     camera)
-  (zoom! [camera amount]
-    (.set ^Mat22 (.-transform camera) (camera/mat-add (.-transform camera)
-                                                      (camera/scale-transform amount))))
+  (zoom*! [camera amount]
+    (.set ^Mat22 (.-transform camera)
+          (math/mat-add (.-transform camera)
+                        (math/scale-transform amount))))
 
   Fixture
   (alter-user-data*! [fixt f args]
