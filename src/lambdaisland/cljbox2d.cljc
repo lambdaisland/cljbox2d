@@ -321,7 +321,7 @@
     (when (some? fixed-rotation?) (set! (.-fixedRotation b) fixed-rotation?))
     (when (some? gravity-scale) (set! (.-gravityScale b) gravity-scale))
     (when (some? linear-damping) (set! (.-linearDamping b) linear-damping))
-    (when (some? linear-velocity) (set! (.-linearVelocity b) linear-velocity))
+    (when (some? linear-velocity) (set! (.-linearVelocity b) (as-vec2 linear-velocity)))
     (when (some? position) (set! (.-position b) (as-vec2 position)))
     (when (some? type) (set! (.-type b) (get body-type type)))
     (set! (.-userData b) (user-data-def props))

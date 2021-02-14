@@ -12,9 +12,20 @@
 (def tile-path "resources/0x72_DungeonTilesetII_v1.3.png")
 (def fireball-path "resources/Fireball_68x9.png")
 
-(def tile-set (e/load-image tile-path))
+(def tile-set (e/load-grid tile-path {:width 16 :height 16 :scale 4}))
+(def fireball-tiles (e/load-grid fireball-path {:width 67
+                                                :height 8
+                                                :pad-x 1
+                                                :pad-y 1
+                                                :scale 4}))
 
-(def monster (e/tile-sequence (e/scale-up-pixels tile-set 4) 64 [1 20 2 2] 8))
+(def monster (e/tile-sequence tile-set [1 20 2 2] 8))
+(def fireball (mapcat
+               #(e/tile-sequence fireball-tiles [0 %] 10)
+               (range 6)))
+
+(defn millis []
+  (System/currentTimeMillis))
 
 (defn setup []
   (q/text-font (q/create-font "Roboto" 24 true)))
@@ -37,6 +48,24 @@
               (e/animate monster 9 (if flipped? (- (- x) w) x) y)
               (q/image (first monster) (if flipped? (- (- x) w) x) y))
             (q/pop-matrix))))
+      (when debug?
+        (q/no-fill)
+        (bq/draw*! body)))))
+
+(defn draw-bullet [body]
+  (let [[x y] (b/world->screen (b/world-center body))
+        {:keys [flipped?]} @body]
+    (let [w (.-pixelWidth ^PImage (first fireball))
+          h (.-pixelHeight ^PImage (first fireball))]
+      (q/with-translation [x y]
+        (q/with-translation [(+ (- (double x))
+                                (- (double (/ w 2))))
+                             (+ (- (double y))
+                                (- -10 (double (/ h 2))))]
+          (q/push-matrix)
+          (q/scale (if flipped? 1 -1) 1)
+          (e/animate fireball 30 (if flipped? x (- (- x) w)) y)
+          (q/pop-matrix)))
       (when debug?
         (q/no-fill)
         (bq/draw*! body)))))
@@ -72,6 +101,25 @@
       (b/listen! :begin-contact ::c #'on-begin-contact)
       (b/listen! :end-contact ::c #'on-end-contact)))
 
+(defn shoot-fire! []
+  (let [bullets (seq (b/find-all-by world :type :bullet))]
+    (when (or (not bullets)
+              (< 200 (- (millis) (apply max (map (comp :start-time deref) bullets)))))
+      (let [player (b/find-by world :id ::player)
+            [x y] (b/world-center player)
+            {:keys [flipped?]} @player]
+        (b/add-body world
+                    {:position [((if flipped? - +) x 2) y]
+                     :linear-velocity (if flipped? [-5 0] [5 0])
+                     :type :kinematic
+                     :bullet? true
+                     :draw draw-bullet
+                     :fixtures [{:shape [:rect 2.68 0.32]
+                                 :density 100}]
+                     :user-data {:type :bullet
+                                 :start-time (millis)
+                                 :flipped? flipped?}})))))
+
 (defn control-player [[x y]]
   (let [player (b/find-by world :id ::player)
         [vx vy] (b/linear-velocity player)]
@@ -85,10 +133,19 @@
   (when (:right @pressed-keys)
     (b/alter-user-data! (b/find-by world :id ::player) assoc :flipped? false)
     (control-player [3 0]))
-  (when (and (:up @pressed-keys ) (:touching? @(b/find-by world :id :foot-sensor)))
-    (control-player [0 -8])))
+  (when (and (:up @pressed-keys) (:touching? @(b/find-by world :id :foot-sensor)))
+    (control-player [0 -8]))
+  (when (:space @pressed-keys)
+    (shoot-fire!)))
+
+(defn clean-up-bullets []
+  (let [now (millis)]
+    (doseq [b (b/find-all-by world :type :bullet)]
+      (when (< 2000 (- now (:start-time @b)))
+        (b/destroy world b)))))
 
 (defn draw []
+  (clean-up-bullets)
   (process-keypress)
   (b/pan-x! (- (.-x (b/world-center (b/find-by world :id ::player)))
                (/ (q/width) 100 2)))

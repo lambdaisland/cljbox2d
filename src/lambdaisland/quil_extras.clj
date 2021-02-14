@@ -58,28 +58,38 @@
     (.updatePixels dest)
     dest))
 
-(defn tile
-  "Slice a single tile out of a tile-set image, tile is a vector of [x y width
-  height], with width/height optional and defaulting to 1"
-  ^PImage [^PImage src ^long tile-size tile]
-  (let [[^long x ^long y w h] tile
-        w (long (or w 1))
-        h (long (or w 1))]
-    (.get src
-          (* x tile-size)
-          (* y tile-size)
-          (* w tile-size)
-          (* h tile-size))))
+(defn slice ^PImage [^PImage src x y w h]
+  (.get src x y w h))
 
-(defn tiles [^PImage src ^long tile-size tiles]
-  (map (partial tile src tile-size) tiles))
+(defprotocol IGrid
+  (tile
+    [_ x y]
+    [_ x y w h]))
+
+(deftype Grid [^PImage src ^long tile-width ^long tile-height ^long pad-x ^long pad-y]
+  IGrid
+  (tile [this x y]
+    (tile this x y 1 1))
+  (tile [_ x y w h]
+    (slice src
+           (* ^long x (+ tile-width pad-x))
+           (* ^long y (+ tile-height pad-y))
+           (* ^long w tile-width)
+           (* ^long h tile-height))))
+
+(defn load-grid [src {:keys [^long width ^long height ^long pad-x ^long pad-y ^long scale]
+                      :or {pad-x 0 pad-y 0 scale 1}}]
+  (let [^PImage src (if (instance? PImage src) src (load-image src))
+        src (if (= 1 scale)
+              src
+              (scale-up-pixels src scale))]
+    (->Grid src (* width scale) (* height scale) (* pad-x scale) (* pad-y scale))))
 
 (defn tile-sequence
   "Slice out a number of left-to-right adjacent tiles out of a tileset"
-  [^PImage src ^long tile-size tile-spec num]
+  [grid tile-spec num]
   (let [^long tile-width (get tile-spec 2 1)]
-    (map #(tile src tile-size
-                (update tile-spec 0 + (* tile-width ^long %)))
+    (map #(apply tile grid (update tile-spec 0 + (* tile-width ^long %)))
          (range num))))
 
 (defn grid-stroke [i]
@@ -87,7 +97,7 @@
     (= (mod i 2) 0) (q/stroke 161 165 134)
     :else           (q/stroke 246 206 31)))
 
-(defn grid
+(defn draw-grid
   "Draw a line grid over the complete sketch, with column/row numbers. Meant for
   identifying tile coordinates in a tile set."
   [^long size]
