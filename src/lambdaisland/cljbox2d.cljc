@@ -286,7 +286,6 @@
                          (count vs)))
      :cljs (ChainShape. (into-array (map as-vec2 vs)) true)))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Body
 
@@ -346,7 +345,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Joint
 
-
 (defn- start-joint-def [type]
   #?(:clj
      (case type
@@ -365,22 +363,22 @@
      :cljs
      #js {}))
 
-(defn- end-joint-def [type def]
+(defn- end-joint-def [type definition]
   #?(:clj
-     def
+     definition
      :cljs
      (case type
-       :distance (DistanceJoint. def)
-       :friction (FrictionJoint. def)
-       :gear (GearJoint. def)
-       :motor (MotorJoint. def)
-       :mouse (MouseJoint. def)
-       :prismatic (PrismaticJoint. def)
-       :pulley (PulleyJoint. def)
-       :revolute (RevoluteJoint. def)
-       :rope (RopeJoint. def)
-       :weld (WeldJoint. def)
-       :wheel (WheelJoint. def))))
+       :distance (DistanceJoint. definition)
+       :friction (FrictionJoint. definition)
+       :gear (GearJoint. definition)
+       :motor (MotorJoint. definition)
+       :mouse (MouseJoint. definition)
+       :prismatic (PrismaticJoint. definition)
+       :pulley (PulleyJoint. definition)
+       :revolute (RevoluteJoint. definition)
+       :rope (RopeJoint. definition)
+       :weld (WeldJoint. definition)
+       :wheel (WheelJoint. definition))))
 
 (defn joint-def [{:keys [type collide-connected? bodies joints
                          ;; constant-volume, distance, mouse
@@ -524,14 +522,16 @@
 ;; similar to watches on an atom. This also makes them quite suitable for a REPL
 ;; driven workflow, since it's easy to continuously replace a specific listener.
 
+(comment
+  ;; listeners looks like:
+  (def listeners (atom {:begin-contact {:my-key (fn [,,,])}})))
+
 (defn- dispatch-event [listeners event & args]
   (doseq [f (vals (get @listeners event))]
     (apply f args)))
 
 #?(:clj
-   (defrecord ContactListenerFanout [listeners
-                                     #_(atom {:begin-contact
-                                              {:my-key (fn [...])}})]
+   (defrecord ContactListenerFanout [listeners]
      ContactListener
      (beginContact [this contact]
        (dispatch-event listeners :begin-contact contact))
