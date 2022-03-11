@@ -1,10 +1,8 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+- Rewrite to a single :require form to appease cljdoc
 
 # 0.4.19 (2022-03-11 / 48f72c2)
 
