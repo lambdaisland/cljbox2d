@@ -1,4 +1,4 @@
-(ns cljbox2d.demo
+(ns lambdaisland.cljbox2d.demo.simple-shapes
   (:require [lambdaisland.cljbox2d :as b]
             [lambdaisland.cljbox2d.quil :as bq]
             [quil.core :as q :include-macros true]))
@@ -41,12 +41,13 @@
   (q/background 161 165 134)
   (bq/draw! world))
 
-(q/defsketch box
-  :host "app"
-  :size [1200 1000]
-  :setup setup
-  :draw draw
-  :frame-rate 60)
+(defn -main []
+  (q/defsketch box
+    :host "app"
+    :size [1200 1000]
+    :setup setup
+    :draw draw
+    :frame-rate 60))
 
 (comment
   (b/zoom! b/*camera* -10)

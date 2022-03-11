@@ -1,4 +1,4 @@
-(ns cljbox2d.tileset
+(ns lambdaisland.cljbox2d.demo.platformer
   (:require [lambdaisland.cljbox2d :as b]
             [lambdaisland.cljbox2d.quil :as bq]
             [lambdaisland.quil-extras :as e]
@@ -155,11 +155,12 @@
   (q/fill 100)
   (q/text (pr-str @pressed-keys) (- (q/width) 300) 150))
 
-(q/defsketch tileset
-  :host "app"
-  :size [1200 1000]
-  :setup setup
-  :draw draw
-  :frame-rate 60
-  :key-pressed #(swap! pressed-keys conj (q/key-as-keyword))
-  :key-released #(swap! pressed-keys disj (q/key-as-keyword)))
+(defn -main []
+  (q/defsketch tileset
+    :host "app"
+    :size [1200 1000]
+    :setup setup
+    :draw draw
+    :frame-rate 60
+    :key-pressed #(swap! pressed-keys conj (q/key-as-keyword))
+    :key-released #(swap! pressed-keys disj (q/key-as-keyword))))

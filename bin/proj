@@ -1,0 +1,15 @@
+#!/usr/bin/env bb
+
+(ns proj (:require [lioss.main :as lioss]))
+
+(lioss/main
+ {:license                   :mpl
+  :inception-year            2021
+  :description               "Clojure/ClojureScript wrapper for the Box2D physics engine"
+  :group-id                  "com.lambdaisland"
+  :aliases-as-scope-provided [:dev]})
+
+
+;; Local Variables:
+;; mode:clojure
+;; End:

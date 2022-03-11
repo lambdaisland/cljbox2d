@@ -1,4 +1,4 @@
-(ns demo.cljbox2d.testbed
+(ns lambdaisland.cljbox2d.demo.testbed
   (:require [lambdaisland.cljbox2d :as b])
   (:import (org.jbox2d.testbed.framework.jogl JoglPanel JoglDebugDraw)
            java.awt.BorderLayout
@@ -115,20 +115,21 @@
     (getTestName []
       (str `testbed-test))))
 
+;; FIXME: this seems to no longer run on openjdk 17
+(defn -main []
+  (launch)
 
-(launch)
+  (.addTest testbed-model
+            (testbed-test (-> (b/world 0 -9)
+                              (b/populate walls)
+                              (b/populate (take 50 (repeatedly random-body))))))
 
-(.addTest testbed-model
-          (testbed-test (-> (b/world 0 -9)
-                            (b/populate walls)
-                            (b/populate (take 50 (repeatedly random-body))))))
-
-(.addTest testbed-model
-          (testbed-test (-> (b/world 0 -10)
-                            (b/populate [{:fixtures [{:shape [:edge [-40 0] [40 0]]}]}])
-                            (b/populate
-                             (for [i (range 20)
-                                   j (range i 20)]
-                               {:type :dynamic
-                                :position [(+ -7 (* i 0.5625) (* j 1.125)) (+ 0.75 (* j 1.25))]
-                                :fixtures [{:shape [:rect 0.5 0.5]}]})))))
+  (.addTest testbed-model
+            (testbed-test (-> (b/world 0 -10)
+                              (b/populate [{:fixtures [{:shape [:edge [-40 0] [40 0]]}]}])
+                              (b/populate
+                               (for [i (range 20)
+                                     j (range i 20)]
+                                 {:type :dynamic
+                                  :position [(+ -7 (* i 0.5625) (* j 1.125)) (+ 0.75 (* j 1.25))]
+                                  :fixtures [{:shape [:rect 0.5 0.5]}]}))))))

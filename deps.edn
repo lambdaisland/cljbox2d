@@ -1,21 +1,19 @@
 {:paths ["src" "resources"]
 
  :deps
- {org.clojure/clojure              {:mvn/version "1.10.1"}
-  reagent/reagent                  {:mvn/version "1.0.0"}
-  cljs-bean/cljs-bean              {:mvn/version "1.6.0"}
-  applied-science/js-interop       {:mvn/version "0.2.7"}
-  mhuebert/kitchen-async           {:mvn/version "0.1.0"}
+ {com.lambdaisland/data-printer    {:mvn/version "0.7.47"}
   lambdaisland/jbox2d-library      {:mvn/version "2.3.1.756"}
-  org.apache.commons/commons-math3 {:mvn/version "3.2"}}
+  org.apache.commons/commons-math3 {:mvn/version "3.6.1"}}
 
  :aliases
  {:dev
-  {:extra-paths ["dev" "demo"]
-   :extra-deps  {thheller/shadow-cljs             {:mvn/version "2.11.14"}
-                 quil/quil                        {:mvn/version "3.1.0"}
+  {:extra-paths ["dev"]
+   :extra-deps  {quil/quil                        {:mvn/version "3.1.0"}
                  lambdaisland/jbox2d-testbed-jogl {:mvn/version "2.3.1.756"}}}
+
+  :cljs
+  {:extra-deps {thheller/shadow-cljs {:mvn/version "2.17.8"}}}
 
   :test
   {:extra-paths ["test"]
-   :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0.732"}}}}}
+   :extra-deps  {lambdaisland/kaocha {:mvn/version "1.63.998"}}}}}

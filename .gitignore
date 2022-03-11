@@ -12,3 +12,4 @@ resources/public/ui
 .store
 package-lock.json
 resources/public/index.html
+JBox2d.log
