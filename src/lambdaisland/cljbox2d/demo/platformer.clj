@@ -2,6 +2,7 @@
   (:require [lambdaisland.cljbox2d :as b]
             [lambdaisland.cljbox2d.quil :as bq]
             [lambdaisland.quil-extras :as e]
+            [clojure.java.io :as io]
             [quil.core :as q :include-macros true])
   (:import (processing.core PApplet PImage)))
 
@@ -9,66 +10,71 @@
 
 (def debug? false)
 
-(def tile-path "resources/0x72_DungeonTilesetII_v1.3.png")
-(def fireball-path "resources/Fireball_68x9.png")
-
-(def tile-set (e/load-grid tile-path {:width 16 :height 16 :scale 4}))
-(def fireball-tiles (e/load-grid fireball-path {:width 67
-                                                :height 9
-                                                :pad-x 1
-                                                :pad-y 0
-                                                :scale 4}))
-
-(def monster (e/tile-sequence tile-set [1 20 2 2] 8))
-(def fireball (mapcat
-               #(e/tile-sequence fireball-tiles [0 %] 10)
-               (range 6)))
+(def assets (atom nil))
 
 (defn millis []
   (System/currentTimeMillis))
 
+(defn load-assets! []
+  (let [tile-path (io/resource "0x72_DungeonTilesetII_v1.3.png")
+        fireball-path (io/resource "Fireball_68x9.png")
+
+        tile-set (e/load-grid tile-path {:width 16 :height 16 :scale 4})
+        fireball-tiles (e/load-grid fireball-path {:width 67
+                                                   :height 9
+                                                   :pad-x 1
+                                                   :pad-y 0
+                                                   :scale 4})]
+    (reset! assets {:monster (e/tile-sequence tile-set [1 20 2 2] 8)
+                    :fireball (mapcat
+                               #(e/tile-sequence fireball-tiles [0 %] 10)
+                               (range 6))})))
+
 (defn setup []
-  (q/text-font (q/create-font "Roboto" 24 true)))
+  (q/text-font (q/create-font "Roboto" 24 true))
+  (load-assets!))
 
 (defn draw-monster-body [body]
-  (let [[x y] (b/world->screen (b/world-center body))
-        {:keys [flipped?]} @body
-        {:keys [touching?]} @(b/find-by body :id :foot-sensor)]
-    (let [w (.-pixelWidth ^PImage (first monster))
-          h (.-pixelHeight ^PImage (first monster))]
-      (q/with-translation [x y]
-        (q/with-rotation [(b/angle body)]
+  (when-let [monster (:monster @assets)]
+    (let [[x y] (b/world->screen (b/world-center body))
+          {:keys [flipped?]} @body
+          {:keys [touching?]} @(b/find-by body :id :foot-sensor)]
+      (let [w (.-pixelWidth ^PImage (first monster))
+            h (.-pixelHeight ^PImage (first monster))]
+        (q/with-translation [x y]
+          (q/with-rotation [(b/angle body)]
+            (q/with-translation [(+ (- (double x))
+                                    (- (double (/ w 2))))
+                                 (+ (- (double y))
+                                    (- -10 (double (/ h 2))))]
+              (q/push-matrix)
+              (q/scale (if flipped? -1 1) 1)
+              (if (and touching? (b/awake? body))
+                (e/animate monster 9 (if flipped? (- (- x) w) x) y)
+                (q/image (first monster) (if flipped? (- (- x) w) x) y))
+              (q/pop-matrix))))
+        (when debug?
+          (q/no-fill)
+          (bq/draw*! body))))))
+
+(defn draw-bullet [body]
+  (when-let [fireball (:fireball @assets)]
+    (let [[x y] (b/world->screen (b/world-center body))
+          {:keys [flipped?]} @body]
+      (let [w (.-pixelWidth ^PImage (first fireball))
+            h (.-pixelHeight ^PImage (first fireball))]
+        (q/with-translation [x y]
           (q/with-translation [(+ (- (double x))
                                   (- (double (/ w 2))))
                                (+ (- (double y))
                                   (- -10 (double (/ h 2))))]
             (q/push-matrix)
-            (q/scale (if flipped? -1 1) 1)
-            (if (and touching? (b/awake? body))
-              (e/animate monster 9 (if flipped? (- (- x) w) x) y)
-              (q/image (first monster) (if flipped? (- (- x) w) x) y))
-            (q/pop-matrix))))
-      (when debug?
-        (q/no-fill)
-        (bq/draw*! body)))))
-
-(defn draw-bullet [body]
-  (let [[x y] (b/world->screen (b/world-center body))
-        {:keys [flipped?]} @body]
-    (let [w (.-pixelWidth ^PImage (first fireball))
-          h (.-pixelHeight ^PImage (first fireball))]
-      (q/with-translation [x y]
-        (q/with-translation [(+ (- (double x))
-                                (- (double (/ w 2))))
-                             (+ (- (double y))
-                                (- -10 (double (/ h 2))))]
-          (q/push-matrix)
-          (q/scale (if flipped? 1 -1) 1)
-          (e/animate fireball 30 (if flipped? x (- (- x) w)) y)
-          (q/pop-matrix)))
-      (when debug?
-        (q/no-fill)
-        (bq/draw*! body)))))
+            (q/scale (if flipped? 1 -1) 1)
+            (e/animate fireball 30 (if flipped? x (- (- x) w)) y)
+            (q/pop-matrix)))
+        (when debug?
+          (q/no-fill)
+          (bq/draw*! body))))))
 
 (defn on-begin-contact [contact]
   (when-let [feet (b/find-by contact :id :foot-sensor)]
@@ -161,6 +167,7 @@
     :size [1200 1000]
     :setup setup
     :draw draw
-    :frame-rate 60
+    :frame-rate 1
     :key-pressed #(swap! pressed-keys conj (q/key-as-keyword))
     :key-released #(swap! pressed-keys disj (q/key-as-keyword))))
+(-main)

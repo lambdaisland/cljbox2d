@@ -6,7 +6,7 @@
 
 Idiomatic and cross-platform Clojure version of the Box2D physics engine API. Wraps jBox2D (Clojure) and Planck.js (ClojureScript).
 
-Created for use with Quil, but can be used independently or with other rendering engines.
+Created for use with Quil, but can be used independently or with other rendering engines. We do include some helpers to integrate cljbox2d with Quil, see `lambdaisland.cljbox2d.quil`
 
 Work in progress. See the demo directory for examples.
 
@@ -15,9 +15,9 @@ Work in progress. See the demo directory for examples.
 Run these commands to see cljbox2d in action:
 
 ```
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.2.12"} quil/quil {:mvn/version "3.1.0"}}}' -M -m lambdaisland.cljbox2d.demo.simple-shapes
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.2.12"} quil/quil {:mvn/version "3.1.0"}}}' -M -m lambdaisland.cljbox2d.demo.pyramid
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.2.12"} quil/quil {:mvn/version "3.1.0"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.2.12"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.simple-shapes
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.2.12"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.pyramid
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.2.12"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
 ```
 
 <!-- installation -->
@@ -36,7 +36,7 @@ or add the following to your `project.clj` ([Leiningen](https://leiningen.org/))
 ```
 <!-- /installation -->
 
-You will also need a library to deal with graphics and user interaction. If unsure you can start with [Quil]()
+You will also need a library to deal with graphics and user interaction. If unsure you can start with [Quil](http://quil.info/).
 
 ## Rationale
 
@@ -45,6 +45,12 @@ create a BodyDef or FixtureDef object, call a bunch of setters to set the right
 parameters, then use that to construct the actual object. Yuck.
 
 For us it's all just data.
+
+## Getting started
+
+There's a
+[template](https://github.com/lambdaisland/cljbox2d/blob/main/src/lambdaisland/cljbox2d/demo/template.cljc)
+file that you can use to set up your first project with cljbox2d and Quil.
 
 ## Hello cljbox2d
 

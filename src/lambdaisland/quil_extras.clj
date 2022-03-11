@@ -1,7 +1,9 @@
 (ns lambdaisland.quil-extras
   (:require [quil.core :as q]
-            [quil.applet :as ap])
-  (:import (processing.core PApplet PImage)))
+            [quil.applet :as applet])
+  (:import (java.awt Graphics2D)
+           (javax.imageio ImageIO)
+           (processing.core PApplet PImage)))
 
 (set! *unchecked-math* :warn-on-boxed)
 (set! *warn-on-reflection* true)
@@ -11,7 +13,17 @@
 (defn height ^long [] (q/height))
 
 (defn load-image ^PImage [path]
-  (.loadImage (doto (PApplet.) .sketchPath) path))
+  (let [applet (applet/current-applet)]
+    (if (instance? java.net.URL path)
+      (let [bi (ImageIO/read (.openStream ^java.net.URL path))
+            width (.getWidth bi)
+            height (.getHeight bi)
+            graphics (doto (.createGraphics applet width height) (.beginDraw))
+            g2d (.getNative graphics)]
+        (.drawImage ^Graphics2D g2d bi 0 0 width height nil)
+        (.endDraw graphics)
+        (.copy graphics))
+      (.loadImage (doto (PApplet.) .sketchPath) path))))
 
 (defn background-image
   "Set the given image as background image, filling the entire sketch. Will resize
