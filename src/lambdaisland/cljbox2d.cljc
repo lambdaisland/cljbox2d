@@ -202,22 +202,22 @@
         :mask-bits (.-maskBits f)
         :group-index (.-groupIndex f)})))
 
-(data-printer/register-type-printer World 'box2d/world value)
-(data-printer/register-type-printer Vec2 'box2d/vec2 value)
-(data-printer/register-type-printer Fixture 'box2d/fixture value)
-(data-printer/register-type-printer Body 'box2d/body value)
-(data-printer/register-type-printer PolygonShape 'box2d/polygon-shape value)
-(data-printer/register-type-printer Shape 'box2d/shape value)
-(data-printer/register-type-printer Transform 'box2d/transform value)
-(data-printer/register-type-printer Rot 'box2d/rot value)
+(data-printer/register-print World 'box2d/world value)
+(data-printer/register-print Vec2 'box2d/vec2 value)
+(data-printer/register-print Fixture 'box2d/fixture value)
+(data-printer/register-print Body 'box2d/body value)
+(data-printer/register-print PolygonShape 'box2d/polygon-shape value)
+(data-printer/register-print Shape 'box2d/shape value)
+(data-printer/register-print Transform 'box2d/transform value)
+(data-printer/register-print Rot 'box2d/rot value)
 
 #?(:clj
    (do
-     (data-printer/register-type-printer BodyDef 'box2d/body-def value)
-     (data-printer/register-type-printer FixtureDef 'box2d/fixture-def value)
-     (data-printer/register-type-printer Filter 'box2d/filter value)
-     (data-printer/register-type-printer BodyType 'box2d/body-type str)
-     (data-printer/register-type-printer ShapeType 'box2d/shape-type str)))
+     (data-printer/register-print BodyDef 'box2d/body-def value)
+     (data-printer/register-print FixtureDef 'box2d/fixture-def value)
+     (data-printer/register-print Filter 'box2d/filter value)
+     (data-printer/register-print BodyType 'box2d/body-type str)
+     (data-printer/register-print ShapeType 'box2d/shape-type str)))
 
 (defn vec2 ^Vec2 [^double x ^double y]
   (#?(:clj Vec2.

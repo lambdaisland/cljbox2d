@@ -1,7 +1,7 @@
 {:paths ["src" "resources"]
 
  :deps
- {com.lambdaisland/data-printer    {:mvn/version "0.7.47"}
+ {lambdaisland/data-printers       {:mvn/version "0.7.47"}
   lambdaisland/jbox2d-library      {:mvn/version "2.3.1.756"}
   org.apache.commons/commons-math3 {:mvn/version "3.6.1"}}
 
