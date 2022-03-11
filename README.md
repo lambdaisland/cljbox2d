@@ -36,7 +36,20 @@ or add the following to your `project.clj` ([Leiningen](https://leiningen.org/))
 ```
 <!-- /installation -->
 
+You will also need a library to deal with graphics and user interaction. If unsure you can start with [Quil]()
+
 ## Rationale
+
+The Box2D API is highly imperative, to create a body or a fixture you first
+create a BodyDef or FixtureDef object, call a bunch of setters to set the right
+parameters, then use that to construct the actual object. Yuck.
+
+For us it's all just data.
+
+## Hello cljbox2d
+
+Our version of the [Hello Box2D](https://box2d.org/documentation/md__d_1__git_hub_box2d_docs_hello.html) tutorial.
+
 
 
 ## Usage

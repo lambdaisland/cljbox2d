@@ -1,7 +1,6 @@
 (ns lambdaisland.cljbox2d.demo.pyramid
   (:require [lambdaisland.cljbox2d :as b]
             [lambdaisland.cljbox2d.quil :as bq]
-            [lambdaisland.quil-extras :as e]
             [quil.core :as q :include-macros true]))
 
 (def world (b/world 0 10))
