@@ -44,9 +44,9 @@ With cljbox2d:
 Run these commands to see cljbox2d in action:
 
 ```
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.3.16"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.simple-shapes
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.3.16"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.pyramid
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.3.16"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.4.19"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.simple-shapes
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.4.19"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.pyramid
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.4.19"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
 ```
 
 <!-- installation -->
@@ -55,13 +55,13 @@ clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.3.16"} quil/q
 To use the latest release, add the following to your `deps.edn` ([Clojure CLI](https://clojure.org/guides/deps_and_cli))
 
 ```
-com.lambdaisland/cljbox2d {:mvn/version "0.3.16"}
+com.lambdaisland/cljbox2d {:mvn/version "0.4.19"}
 ```
 
 or add the following to your `project.clj` ([Leiningen](https://leiningen.org/))
 
 ```
-[com.lambdaisland/cljbox2d "0.3.16"]
+[com.lambdaisland/cljbox2d "0.4.19"]
 ```
 <!-- /installation -->
 
