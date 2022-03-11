@@ -18,13 +18,13 @@ Work in progress. See the demo directory for examples.
 To use the latest release, add the following to your `deps.edn` ([Clojure CLI](https://clojure.org/guides/deps_and_cli))
 
 ```
-com.lambdaisland/cljbox2d {:mvn/version "0.0.0"}
+com.lambdaisland/cljbox2d {:mvn/version "0.1.9"}
 ```
 
 or add the following to your `project.clj` ([Leiningen](https://leiningen.org/))
 
 ```
-[com.lambdaisland/cljbox2d "0.0.0"]
+[com.lambdaisland/cljbox2d "0.1.9"]
 ```
 <!-- /installation -->
 
