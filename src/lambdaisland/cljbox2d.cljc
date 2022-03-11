@@ -1,9 +1,12 @@
 (ns lambdaisland.cljbox2d
-  (:require [lambdaisland.cljbox2d.data-printer :as data-printer]
-            [lambdaisland.cljbox2d.camera :as camera]
-            [lambdaisland.cljbox2d.math :as math])
-  #?(:clj (:require [lambdaisland.cljbox2d.svd :as svd])
-     :cljs (:require ["planck-js" :as planck]
+  #?(:clj (:require  [lambdaisland.cljbox2d.data-printer :as data-printer]
+                     [lambdaisland.cljbox2d.camera :as camera]
+                     [lambdaisland.cljbox2d.math :as math]
+                     [lambdaisland.cljbox2d.svd :as svd])
+     :cljs (:require [lambdaisland.cljbox2d.data-printer :as data-printer]
+                     [lambdaisland.cljbox2d.camera :as camera]
+                     [lambdaisland.cljbox2d.math :as math]
+                     ["planck-js" :as planck]
                      ["planck-js/lib/common/Vec2" :as Vec2]
                      ["planck-js/lib/common/Mat22" :as Mat22]
                      ["planck-js/lib/common/Transform" :as Transform]
