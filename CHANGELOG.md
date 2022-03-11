@@ -1,26 +1,10 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
-
-# 0.3.16 (2022-03-11 / 3c12a10)
-
-## Added
-
-## Fixed
-
-## Changed
-
-# 0.2.12 (2022-03-11 / cd9926a)
-
-## Added
-
-## Fixed
-
-## Changed
+- Fix cljdoc build
+- Fix platformer demo, load images from resources (jar) instead of filesystem
+- Switch to Quil 4
 
 # 0.1.9 (2022-03-11 / 9627741)
 

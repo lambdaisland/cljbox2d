@@ -170,4 +170,3 @@
     :frame-rate 1
     :key-pressed #(swap! pressed-keys conj (q/key-as-keyword))
     :key-released #(swap! pressed-keys disj (q/key-as-keyword))))
-(-main)

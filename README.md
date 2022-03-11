@@ -10,6 +10,35 @@ Created for use with Quil, but can be used independently or with other rendering
 
 Work in progress. See the demo directory for examples.
 
+## Rationale
+
+The Box2D API is highly imperative, to create a body or a fixture you first
+create a BodyDef or FixtureDef object, call a bunch of setters to set the right
+parameters, then use that to construct the actual object. Yuck.
+
+For us it's all just data. For comparison
+
+```c++
+;; create bodyDef
+b2BodyDef groundBodyDef;
+groundBodyDef.position.Set(0.0f, -10.0f);
+
+;; use it to create a body
+b2Body* groundBody = world.CreateBody(&groundBodyDef);
+
+;; Add a fixture 
+b2PolygonShape groundBox;
+groundBox.SetAsBox(50.0f, 10.0f);
+groundBody->CreateFixture(&groundBox, 0.0f);
+```
+
+With cljbox2d:
+
+```clojure
+(b/populate world [{:position [0 -10]
+                    :fixtures [{:shape [:rect 50 10]}]}])
+```
+
 ## Demos
 
 Run these commands to see cljbox2d in action:
@@ -38,29 +67,24 @@ or add the following to your `project.clj` ([Leiningen](https://leiningen.org/))
 
 You will also need a library to deal with graphics and user interaction. If unsure you can start with [Quil](http://quil.info/).
 
-## Rationale
-
-The Box2D API is highly imperative, to create a body or a fixture you first
-create a BodyDef or FixtureDef object, call a bunch of setters to set the right
-parameters, then use that to construct the actual object. Yuck.
-
-For us it's all just data.
-
 ## Getting started
 
 There's a
 [template](https://github.com/lambdaisland/cljbox2d/blob/main/src/lambdaisland/cljbox2d/demo/template.cljc)
 file that you can use to set up your first project with cljbox2d and Quil.
 
-## Hello cljbox2d
+You'll want to learn about the main Box2D concepts: bodies, shapes, fixtures,
+and joints. The clearest explanation I've come across is in these iForce2D
+tutorials: [bodies](https://www.iforce2d.net/b2dtut/bodies), [fixtures &
+shapes](https://www.iforce2d.net/b2dtut/fixtures). There are also the official
+[Box2D docs](https://box2d.org/documentation/). Until we get more comprehensive
+documentation of our own together you'll have to make due with these, and the
+convert to cljbox2d.
 
-Our version of the [Hello Box2D](https://box2d.org/documentation/md__d_1__git_hub_box2d_docs_hello.html) tutorial.
-
-
-
-## Usage
-
-
+The
+[demos](https://github.com/lambdaisland/cljbox2d/tree/main/src/lambdaisland/cljbox2d/demo)
+contain a number of examples you can study, from trivial (template,
+simple-shapes, pyramid), to more full-fledged (platformer).
 
 ## Writing portable code
 
