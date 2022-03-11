@@ -1,3 +1,11 @@
+# Unreleased
+
+## Added
+
+## Fixed
+
+## Changed
+
 # 0.4.19 (2022-03-11 / 48f72c2)
 
 ## Fixed
