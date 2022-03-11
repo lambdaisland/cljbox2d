@@ -10,7 +10,15 @@ Created for use with Quil, but can be used independently or with other rendering
 
 Work in progress. See the demo directory for examples.
 
-## Features
+## Demos
+
+Run these commands to see cljbox2d in action:
+
+```
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.1.9"} quil/quil {:mvn/version "3.1.0"}}}' -M -m lambdaisland.cljbox2d.demo.simple-shapes
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.1.9"} quil/quil {:mvn/version "3.1.0"}}}' -M -m lambdaisland.cljbox2d.demo.pyramid
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.1.9"} quil/quil {:mvn/version "3.1.0"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
+```
 
 <!-- installation -->
 ## Installation
