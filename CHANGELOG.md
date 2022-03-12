@@ -2,6 +2,8 @@
 
 ## Added
 
+- [Clojure2d](https://github.com/Clojure2D/clojure2d) support
+
 ## Fixed
 
 ## Changed
