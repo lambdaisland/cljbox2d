@@ -7,8 +7,7 @@
   :inception-year            2021
   :description               "Clojure/ClojureScript wrapper for the Box2D physics engine"
   :group-id                  "com.lambdaisland"
-  :aliases-as-scope-provided [:quil4 :testbed]})
-
+  :aliases-as-scope-provided [:quil4 :clojure2d :testbed]})
 
 ;; Local Variables:
 ;; mode:clojure
