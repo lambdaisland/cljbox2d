@@ -23,6 +23,14 @@
   #?(:clj (.sub v1 v2)
      :cljs (Vec2/sub v1 v2)))
 
+(defn vec-mul ^Vec2 [^Vec2 v ^double a]
+  #?(:clj (.mul v a)
+     :cljs (Vec2/mul v a)))
+
+(defn vec-length ^double [^Vec2 v]
+  #?(:clj (.length v)
+     :cljs (Vec2/lengthOf v)))
+
 (defn mat-angle
   "Extract the angle from this matrix (assumed to be a rotation matrix)."
   [^Mat22 mat]
@@ -33,3 +41,11 @@
   "Transformation matrix that scales vectors by a fixed amount in both dimensions"
   [^double scale]
   (Mat22. (Vec2. scale 0) (Vec2. 0 scale)))
+
+;; Convenience shorthand
+
+(def m* mat-mul)
+(def m+ mat-add)
+(def v+ vec-add)
+(def v- vec-sub)
+(def v* vec-mul)
