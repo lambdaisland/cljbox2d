@@ -1,8 +1,9 @@
 (ns lambdaisland.cljbox2d.camera
-  (:require [lambdaisland.cljbox2d.math :as math])
-  #?(:cljs (:require ["planck-js/lib/common/Vec2" :as Vec2]
-                     ["planck-js/lib/common/Mat22" :as Mat22])
-     :clj (:import (org.jbox2d.common Vec2 Mat22))))
+  #?(:clj (:require [lambdaisland.cljbox2d.math :as math])
+     :cljs (:require [lambdaisland.cljbox2d.math :as math]
+                     ["planck-js/lib/common/Vec2" :as Vec2]
+                     ["planck-js/lib/common/Mat22" :as Mat22]))
+  #?(:clj (:import (org.jbox2d.common Vec2 Mat22))))
 
 (defprotocol ICamera
   (center [cam])

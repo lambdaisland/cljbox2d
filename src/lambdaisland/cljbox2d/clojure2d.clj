@@ -1,8 +1,7 @@
-;; Glue code to enable drawing via `clojure2d` library.
-;; The main difference from `quil` is that `canvas` context should be provided explicitely.
-;; Contract for a custom `draw` function should accept a canvas as the last parameter.
-
 (ns lambdaisland.cljbox2d.clojure2d
+  "Glue code to enable drawing via `clojure2d` library.
+  The main difference from `quil` is that `canvas` context should be provided explicitely.
+  Contract for a custom `draw` function should accept a canvas as the last parameter."
   (:require [lambdaisland.cljbox2d :as b]
             [lambdaisland.cljbox2d.math :as math]
             [clojure2d.core :as c2d])
@@ -49,7 +48,7 @@
           (c2d/rotate (math/mat-angle matrix))
           (c2d/ellipse x y (* scale-x radius 2.0) (* scale-y radius 2.0) true)
           (c2d/pop-matrix))))
-  
+
   EdgeShape
   (draw-shape! [shape body canvas]
     (let [[[x1 y1] [x2 y2]] (map b/world->screen (b/world-vertices body shape))]

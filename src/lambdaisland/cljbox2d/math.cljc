@@ -1,4 +1,5 @@
 (ns lambdaisland.cljbox2d.math
+  "Helper functions for Box2D vector/matrix math"
   #?(:cljs (:require ["planck-js/lib/common/Vec2" :as Vec2]
                      ["planck-js/lib/common/Mat22" :as Mat22])
      :clj (:import (org.jbox2d.common Vec2 Mat22))))
