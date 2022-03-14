@@ -28,8 +28,8 @@
                :friction 3}]})
 
 (def world (-> (b/world 0 1.0)
-             (b/populate walls)
-             (b/populate (repeatedly 50 random-body))))
+               (b/populate walls)
+               (b/populate (repeatedly 50 random-body))))
 
 (defn draw
   [canvas _ _ _]
@@ -38,7 +38,8 @@
       (c2d/set-background 161 165 134)
       (bc2d/draw! world)))
 
-(def window (c2d/show-window {:canvas (c2d/canvas 1200 1000)
-                            :draw-fn draw
-                            :window-name "Simple shapes"}))
 
+(defn -main []
+  (c2d/show-window {:canvas (c2d/canvas 1200 1000)
+                    :draw-fn draw
+                    :window-name "Simple shapes"}))

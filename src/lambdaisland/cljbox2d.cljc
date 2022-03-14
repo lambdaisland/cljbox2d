@@ -731,6 +731,11 @@
            (f index point normal fraction))))))
 
 (defn raycast
+  "Perform a raycasting query, this finds bodies that are \"visible\" from the
+  given point. This takes a callback function, which receives the fixture,
+  point, normal, and fraction. The return value from the callback determines
+  whether the search terminates or not. See [[raycast-seq]] for a more
+  convenient wrapper."
   ([^World world rcb point1 point2]
    #?(:clj
       (.raycast world
@@ -755,14 +760,30 @@
                     (as-vec2 point1)
                     (as-vec2 point2))))
 
-(defn raycast-seq [^World world point1 point2]
-  (let [result (volatile! (transient []))]
-    (raycast world
-             (fn [fixture _ _ _]
-               (vswap! result conj! fixture)
-               1)
-             point1 point2)
-    (persistent! @result)))
+(defn raycast-seq
+  "Perform raycasting and return a sequence of fixtures
+
+  This draws a line from point1 to point2, and returns fixtures that intersect
+  the line. Behavior can be `:all`, return all fixtures, or `:first`, return the
+  first matching fixture. Defaults to `:first`.
+
+  For each fixture returns a map of `:fixture`: the matching fixture, `:point`:
+  the point of initial intersection, `:normal`: the normal vector at point of
+  intersection, `:fraction`: the fraction along the ray at point of
+  intersection."
+  ([^World world point1 point2]
+   (raycast-seq world point1 point2 :first))
+  ([^World world point1 point2 behavior]
+   (let [result (volatile! (transient []))
+         return-val (case behavior
+                      :all 1
+                      :first 0)]
+     (raycast world
+              (fn [fixture point normal fraction]
+                (vswap! result conj! {:fixture fixture :point point :normal normal :fraction fraction})
+                return-val)
+              point1 point2)
+     (persistent! @result))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Properties and Operations

@@ -1,4 +1,4 @@
-((nil . ((cider-clojure-cli-global-options     . "-A:cljs:quil4:testbed:test")
+((nil . ((cider-clojure-cli-global-options     . "-A:cljs:quil4:testbed:test:clojure2d")
          (cider-custom-cljs-repl-init-form     . "(user/cljs-repl)")
          (cider-default-cljs-repl              . custom)
          (cider-preferred-build-tool           . clojure-cli)

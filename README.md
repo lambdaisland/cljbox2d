@@ -6,9 +6,12 @@
 
 Idiomatic and cross-platform Clojure version of the Box2D physics engine API. Wraps jBox2D (Clojure) and Planck.js (ClojureScript).
 
-Created for use with Quil, but can be used independently or with other rendering engines. We do include some helpers to integrate cljbox2d with Quil, see `lambdaisland.cljbox2d.quil`
-
-Work in progress. See the demo directory for examples.
+Box2D is just a physics engine, you most likely want to combine it with a
+graphics library to show something on the screen. We bundle some helpers to get
+you started on [Quil](http://quil.info/) or
+[Clojure2D](https://github.com/Clojure2D/clojure2d), see the namespaces
+`lambdaisland.cljbox2d.quil` or `lambdaisland.cljbox2d.clojure2d` respectively,
+or browse the examples under `lambdaisland.cljbox2d.demo.*`
 
 ## Rationale
 
