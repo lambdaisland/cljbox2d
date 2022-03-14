@@ -3,12 +3,12 @@
 ## Added
 
 - [Clojure2d](https://github.com/Clojure2D/clojure2d) support
-
-## Fixed
+- `math/vec-mul`, and shorter math aliases (`v+`, `v*`, `m*`, etc)
 
 ## Changed
 
-- Breaking! Return maps from `raycast-seq`, rather than fixtures.
+- Breaking! Return maps from `raycast-seq`, rather than fixtures, allow setting
+  raycast-callback return value to set filtering behavior.
 
 # 0.5.23 (2022-03-11 / 7b55d21)
 
@@ -22,7 +22,7 @@
 
 - Fix cljdoc build
 - Fix platformer demo, load images from resources (jar) instead of filesystem
-- Switch to Quil 4
+- Switch to Quil 4 snapshot
 
 # 0.1.9 (2022-03-11 / 9627741)
 
