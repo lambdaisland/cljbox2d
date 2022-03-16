@@ -2,7 +2,12 @@
 
 ## Added
 
+- Added two-arity version of `apply-impulse!`, defaults to `wake? false`
+
 ## Fixed
+
+- Make return type tags in protocols fully qualified, Clojure seems to like that
+  better
 
 ## Changed
 

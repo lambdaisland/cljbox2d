@@ -80,11 +80,11 @@
   (value [_]))
 
 (defprotocol IProperty
-  (body ^Body [_])
+  (body ^org.jbox2d.dynamics.Body [_])
   (angle [_])
   (position ^org.jbox2d.common.Vec2 [_])
-  (fixture ^Fixture [_])
-  (shape ^Shape [_])
+  (fixture ^org.jbox2d.dynamics.Fixture [_])
+  (shape ^org.jbox2d.collision.shapes.Shape [_])
   (centroid [_] "Local position of a shape/fixture inside a body")
   (bodies [_])
   (fixtures [_])
@@ -114,7 +114,7 @@
   (alter-user-data*! [entity f args])
   (apply-force! [_ force] [_ force point])
   (apply-torque! [_ torque])
-  (apply-impulse! [_ impulse wake?] [_ impulse point wake?])
+  (apply-impulse! [_ impulse] [_ impulse wake?] [_ impulse point wake?])
   (apply-angular-impulse! [_ impulse]))
 
 (defn alter-user-data! [entity f & args]
@@ -976,6 +976,8 @@
   (apply-torque! [b torque]
     (.applyTorque b torque))
   (apply-impulse!
+    ([b impulse]
+     (.applyLinearImpulse b (as-vec2 impulse) (.getWorldCenter b) false))
     ([b impulse wake?]
      (.applyLinearImpulse b (as-vec2 impulse) (.getWorldCenter b) wake?))
     ([b impulse point wake?]
