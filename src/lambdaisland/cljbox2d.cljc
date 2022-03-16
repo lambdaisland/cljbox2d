@@ -903,6 +903,8 @@
     (.-m_angularVelocity b))
   (world-center [b]
     (.getWorldCenter b))
+  (joints [b]
+    nil)
 
   Fixture
   (body [f]

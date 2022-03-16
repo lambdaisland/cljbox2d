@@ -3,6 +3,9 @@
 ## Added
 
 - Added two-arity version of `apply-impulse!`, defaults to `wake? false`
+- Implement `joints` for body instances. This returns `nil`, since joints are
+  part of the world, but it allows code to recurse safely by calling `bodies`
+  and `joints` on various entities
 
 ## Fixed
 
@@ -16,7 +19,7 @@
 
 - When adding bodies/joints that have an `:id`, remove any bodies/joints with
   the same `:id`. This is to ensure uniqueness, but also makes for a nicer REPL
-  experience.
+  experience
 - When converting to edn (IValue), include :joints for world, and omit default
   values for body
 
