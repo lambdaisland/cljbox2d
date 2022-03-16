@@ -727,25 +727,29 @@
 
 (defn find-by
   "Find a body or fixture with a given user-data property,
-  e.g. (find-by world :id :player)"
+  e.g. (find-by world :id :player)."
   [container k v]
-  (if (sequential? container)
-    (some #(find-by % k v) container)
-    (reduce #(when (= (get (user-data %2) k) v)
-               (reduced %2))
-            nil
-            (concat (bodies container)
-                    (fixtures container)))))
+  (when container
+    (if (sequential? container)
+      (some #(find-by % k v) container)
+      (reduce #(when (= (get (user-data %2) k) v)
+                 (reduced %2))
+              nil
+              (concat (bodies container)
+                      (fixtures container)
+                      (joints container))))))
 
 (defn find-all-by
   "Find all bodies or fixtures with a given user-data property,
   e.g. (find-by world :type :npc)"
   [container k v]
-  (if (sequential? container)
-    (mapcat #(find-all-by % k v))
-    (filter (comp #{v} #(get % k) user-data)
-            (concat (bodies container)
-                    (fixtures container)))))
+  (when container
+    (if (sequential? container)
+      (mapcat #(find-all-by % k v))
+      (filter (comp #{v} #(get % k) user-data)
+              (concat (bodies container)
+                      (fixtures container)
+                      (joints container))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Querying
