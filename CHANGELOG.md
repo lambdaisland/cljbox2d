@@ -14,6 +14,9 @@
 
 ## Changed
 
+- When adding bodies/joints that have an `:id`, remove any bodies/joints with
+  the same `:id`. This is to ensure uniqueness, but also makes for a nicer REPL
+  experience.
 - When converting to edn (IValue), include :joints for world, and omit default
   values for body
 

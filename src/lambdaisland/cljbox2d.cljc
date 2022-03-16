@@ -616,7 +616,35 @@
   ([^Body body shape density]
    (.createFixture body ^Shape shape ^double density)))
 
-(defn add-body [^World world props]
+(defn add-body
+  "Add a new body to the world based on the given properties map.
+
+  - `:position [x y]` : position in the world
+  - `:fixtures [...]` : list of fixtures to add to the body
+  - `:type` one of `:kinematic`, `:dynamic`, `:static`
+  - `:user-date` map of data to associate with this body. Can be accessed by
+    deref-ing the body instance
+  - `:id` : unique id for this body, when present will cause an existing body
+    with the same `:id` to be destroyed and replaced. Gets added to `:user-data`.
+  - `:draw` : custom draw function. Gets added to `:user-data`
+  - `:active?`
+  - `:allow-sleep?`
+  - `:angle`
+  - `:angular-damping`
+  - `:angular-velocity`
+  - `:awake?`
+  - `:bullet?`
+  - `:fixed-rotation?`
+  - `:gravity-scale`
+  - `:linear-damping`
+  - `:linear-velocity`
+  "
+  [^World world
+   {:keys [active? allow-sleep? angle angular-damping angular-velocity awake?
+           bullet? fixed-rotation? gravity-scale linear-damping linear-velocity
+           position type user-data id draw] :as props}]
+  (when-let [prev-body (and (:id props) (find-by (bodies world) :id (:id props)))]
+    (.destroyBody world ^Body prev-body))
   (let [body (.createBody world (body-def props))]
     (run! (partial add-fixture body) (:fixtures props))
     body))
@@ -625,6 +653,8 @@
   (into {} (map (juxt (comp :id user-data) identity)) entities))
 
 (defn add-joint [^World world props]
+  (when-let [prev-joint (and (:id props) (find-by (joints world) :id (:id props)))]
+    (.destroyJoint world ^Joint prev-joint))
   (let [id->body (indexed (bodies world))
         id->joint (indexed (joints world))
         props (-> props
@@ -635,7 +665,6 @@
 (defn world [gravity-x gravity-y]
   (let [world (World. (vec2 gravity-x gravity-y))]
     (setup-listener-fanout! world)
-
     world))
 
 (defn populate
