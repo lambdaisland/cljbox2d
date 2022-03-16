@@ -127,7 +127,8 @@
   World
   (value [w]
     {:gravity (gravity w)
-     :bodies (bodies w)})
+     :bodies (bodies w)
+     :joints (joints w)})
   Vec2
   (value [v]
     [(.-x v) (.-y v)])
@@ -143,12 +144,17 @@
      :user-data (user-data f)})
   Body
   (value [b]
-    {:position (position b)
-     :angle (angle b)
-     :fixtures (fixtures b)
-     :fixed-rotation? (fixed-rotation? b)
-     :bullet? (bullet? b)
-     :transform (transform b)})
+    (cond-> {:position (position b)
+             :fixtures (fixtures b)
+             :transform (transform b)}
+      (not= 0.0 (angle b))
+      (assoc :angle (angle b))
+      (fixed-rotation? b)
+      (assoc :fixed-rotation? true)
+      (bullet? b)
+      (assoc :bullet? true)
+      (seq (user-data b))
+      (assoc :user-data (user-data b))))
 
   Shape
   (value [s]
