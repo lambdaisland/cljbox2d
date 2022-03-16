@@ -455,10 +455,10 @@
         (when (some? damping) (set! (.-dampingRatio j) damping)))
       :prismatic
       (let [j ^PrismaticJointDef j]
-        (let [[aa ab] local-anchors]
-          (when aa (set! (.-localAnchorA j) (as-vec2 aa)))
-          (when ab (set! (.-localAnchorB j) (as-vec2 ab))))
-        (when (some? local-axis) (set! (.-localAxisA j) (as-vec2 local-axis)))
+        (let [[[ax ay] [bx by]] local-anchors]
+          (when ax (.set (.-localAnchorA j) ax ay))
+          (when bx (.set (.-localAnchorB j) bx by)))
+        (when (some? local-axis) (.set (.-localAxisA j) (first local-axis) (second local-axis)))
         (when (some? reference-angle) (set! (.-referenceAngle j) reference-angle))
         (when (some? enable-limit?) (set! (.-enableLimit j) enable-limit?))
         (when (some? lower-translation) (set! (.-lowerTranslation j) lower-translation))

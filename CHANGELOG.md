@@ -8,6 +8,8 @@
 
 - Make return type tags in protocols fully qualified, Clojure seems to like that
   better
+- Fix PrismaticJointDef creation, some vector fields are final, we can only
+  mutate the existing instance
 
 ## Changed
 
