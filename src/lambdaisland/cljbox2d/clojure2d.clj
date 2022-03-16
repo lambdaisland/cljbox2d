@@ -20,14 +20,17 @@
 
 (extend-protocol IDraw
   World
-  (draw*! [w canvas] (run! (partial draw! canvas) (b/bodies w)))
+  (draw*! [w canvas]
+    (locking w
+      (run! (partial draw! canvas) (b/bodies w))))
   Body
   (draw*! [b canvas] (run! (partial draw! canvas) (b/fixtures b)))
   Fixture
   (draw*! [f canvas]
     (if-let [draw (:draw (b/user-data f))]
       (draw f canvas)
-      (draw-shape! (b/shape f) (b/body f) canvas)))
+      (when-let [s (b/shape f)]
+        (draw-shape! s (b/body f) canvas))))
 
   PolygonShape
   (draw-shape! [shape body canvas]
