@@ -590,6 +590,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Build world
 
+(defn destroy [^World world object]
+  (locking world
+    (cond
+      (instance? Joint object)
+      (.destroyJoint world ^Joint object))
+    (cond
+      (instance? Body object)
+      (.destroyBody world ^Body object))))
+
 (defn add-fixture
   ([^Body body f]
    #?(:clj (cond
@@ -636,14 +645,6 @@
    (run! (partial add-body world) bodies)
    (run! (partial add-joint world) joints)
    world))
-
-(defn destroy [^World world object]
-  (cond
-    (instance? Joint object)
-    (.destroyJoint world ^Joint object))
-  (cond
-    (instance? Body object)
-    (.destroyBody world ^Joint object)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Use world

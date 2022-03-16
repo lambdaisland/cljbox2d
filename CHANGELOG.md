@@ -10,6 +10,7 @@
   better
 - Fix PrismaticJointDef creation, some vector fields are final, we can only
   mutate the existing instance
+- Wrap `destroy` in a mutex, to allow for rendering of a consistent world view
 
 ## Changed
 
