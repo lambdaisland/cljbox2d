@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.lambdaisland</groupId>
   <artifactId>cljbox2d</artifactId>
-  <version>0.7.43</version>
+  <version>0.8.46</version>
   <name>cljbox2d</name>
   <description>Clojure/ClojureScript wrapper for the Box2D physics engine</description>
   <url>https://github.com/lambdaisland/cljbox2d</url>
@@ -25,7 +25,7 @@
     <url>https://github.com/lambdaisland/cljbox2d</url>
     <connection>scm:git:git://github.com/lambdaisland/cljbox2d.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/lambdaisland/cljbox2d.git</developerConnection>
-    <tag>0cac56a5b11905ba8b9c97127817bff585eef19f</tag>
+    <tag>204b434642f5cb0de6cb63e460d5115802f40047</tag>
   </scm>
   <dependencies>
     <dependency>
@@ -95,7 +95,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <git-revision>0cac56a5b11905ba8b9c97127817bff585eef19f</git-revision>
+              <git-revision>204b434642f5cb0de6cb63e460d5115802f40047</git-revision>
             </manifestEntries>
           </archive>
         </configuration>
