@@ -47,9 +47,9 @@ With cljbox2d:
 Run these commands to see cljbox2d in action:
 
 ```
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.7.43"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.simple-shapes
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.7.43"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.pyramid
-clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.7.43"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.8.46"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.simple-shapes
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.8.46"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.pyramid
+clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.8.46"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
 ```
 
 Or if you already have a REPL open then simply open any of the
@@ -71,13 +71,13 @@ over to your own project and take it from there.
 To use the latest release, add the following to your `deps.edn` ([Clojure CLI](https://clojure.org/guides/deps_and_cli))
 
 ```
-com.lambdaisland/cljbox2d {:mvn/version "0.7.43"}
+com.lambdaisland/cljbox2d {:mvn/version "0.8.46"}
 ```
 
 or add the following to your `project.clj` ([Leiningen](https://leiningen.org/))
 
 ```
-[com.lambdaisland/cljbox2d "0.7.43"]
+[com.lambdaisland/cljbox2d "0.8.46"]
 ```
 <!-- /installation -->
 
