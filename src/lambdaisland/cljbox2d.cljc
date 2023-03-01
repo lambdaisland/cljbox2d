@@ -265,13 +265,16 @@
     (rectangle width height)))
 
 (defmethod make-shape :circle [[_ a b]]
-  (let [s (CircleShape.)]
-    (if b
-      (do
-        (set! (.-m_p s) (as-vec2 a))
-        (set! (.-m_radius s) b))
-      (set! (.-m_radius s) a))
-    s))
+  #?(:clj
+     (let [s (CircleShape.)]
+       (if b
+         (do
+           (.set (.-m_p s) (as-vec2 a))
+           (set! (.-m_radius s) b))
+         (set! (.-m_radius s) a))
+       s)
+     :cljs
+     (CircleShape. a b)))
 
 (defmethod make-shape :edge [[_ v1 v2]]
   (let [s (EdgeShape.)]
@@ -590,6 +593,32 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Build world
 
+(defn find-by
+  "Find a body or fixture with a given user-data property,
+  e.g. (find-by world :id :player)."
+  [container k v]
+  (when container
+    (if (sequential? container)
+      (some #(find-by % k v) container)
+      (reduce #(when (= (get (user-data %2) k) v)
+                 (reduced %2))
+              nil
+              (concat (bodies container)
+                      (fixtures container)
+                      (joints container))))))
+
+(defn find-all-by
+  "Find all bodies or fixtures with a given user-data property,
+  e.g. (find-by world :type :npc)"
+  [container k v]
+  (when container
+    (if (sequential? container)
+      (mapcat #(find-all-by % k v))
+      (filter (comp #{v} #(get % k) user-data)
+              (concat (bodies container)
+                      (fixtures container)
+                      (joints container))))))
+
 (defn destroy [^World world object]
   (locking world
     (cond
@@ -724,32 +753,6 @@
   ([^Body body fixture-or-shape]
    (let [vertices (vertices fixture-or-shape)]
      (map (partial world-point body) vertices))))
-
-(defn find-by
-  "Find a body or fixture with a given user-data property,
-  e.g. (find-by world :id :player)."
-  [container k v]
-  (when container
-    (if (sequential? container)
-      (some #(find-by % k v) container)
-      (reduce #(when (= (get (user-data %2) k) v)
-                 (reduced %2))
-              nil
-              (concat (bodies container)
-                      (fixtures container)
-                      (joints container))))))
-
-(defn find-all-by
-  "Find all bodies or fixtures with a given user-data property,
-  e.g. (find-by world :type :npc)"
-  [container k v]
-  (when container
-    (if (sequential? container)
-      (mapcat #(find-all-by % k v))
-      (filter (comp #{v} #(get % k) user-data)
-              (concat (bodies container)
-                      (fixtures container)
-                      (joints container))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Querying
