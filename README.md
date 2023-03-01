@@ -52,6 +52,19 @@ clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.7.43"} quil/q
 clojure -Sdeps '{:deps {com.lambdaisland/cljbox2d {:mvn/version "0.7.43"} quil/quil {:mvn/version "4.0.0-SNAPSHOT"}}}' -M -m lambdaisland.cljbox2d.demo.platformer
 ```
 
+Or if you already have a REPL open then simply open any of the
+`lambdaisland.cljbox2d.demo.*` namespaces, evaluate them, and then run the
+`(-main)` function.
+
+```clj
+(require 'lambdaisland.cljbox2d.demo.pyramid)
+(lambdaisland.cljbox2d.demo.pyramid/-main)
+```
+
+To start your own project you can copy `lambdaisland.cljbox2d.demo.template`
+(for Quil) or `lambdaisland.cljbox2d.demo.clojure2d.template` (for Clojure2D)
+over to your own project and take it from there.
+
 <!-- installation -->
 ## Installation
 

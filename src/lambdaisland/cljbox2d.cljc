@@ -983,7 +983,9 @@
   (fixtures [c]
     [(.-m_fixtureA c) (.-m_fixtureB c)])
   (bodies [c]
-    (map body (fixtures c))))
+    (map body (fixtures c)))
+  (joints [c]
+    nil))
 
 (extend-protocol IOperations
   World

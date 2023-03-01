@@ -2,9 +2,8 @@
 
 ## Added
 
-## Fixed
-
-## Changed
+- Add a null-implementation for `joints` to `Contact`, so `find-by` works on
+  `Contact` instances
 
 # 0.7.43 (2023-03-01 / 7c1ad72)
 
