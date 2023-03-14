@@ -104,12 +104,14 @@
   (awake? [_])
   (linear-velocity [_])
   (angular-velocity [_])
-  (world-center [_]))
+  (world-center [_])
+  (zoom [_]))
 
 (defprotocol IOperations
   (move-to! [_ v])
   (move-by! [_ v])
-  (zoom*! [_ f])
+  (zoom! [_ f])
+  (zoom+! [_ f])
   (ctl1! [entity k v] "Generically control properties")
   (alter-user-data*! [entity f args])
   (apply-force! [_ force] [_ force point])
@@ -835,11 +837,11 @@
   (doseq [[k v] (partition 2 kvs)]
     (ctl1! entity k v)))
 
-(defn zoom!
+(defn zoom-by!
   ([amount]
-   (zoom*! *camera* amount))
+   (zoom+! *camera* amount))
   ([camera amount]
-   (zoom*! camera amount)))
+   (zoom+! camera amount)))
 
 (defn pan!
   ([x y]
@@ -974,6 +976,8 @@
     (camera/center c))
   (transform [c]
     (.-transform c))
+  (zoom [c]
+    (camera/zoom c))
 
   Joint
   (user-data [j]
@@ -1040,10 +1044,10 @@
     (.set ^Vec2 (.-center camera) (math/vec-add (.-center camera)
                                                 (as-vec2 offset)))
     camera)
-  (zoom*! [camera amount]
-    (.set ^Mat22 (.-transform camera)
-          (math/mat-add (.-transform camera)
-                        (math/scale-transform amount))))
+  (zoom! [camera amount]
+    (camera/set-scale! camera amount))
+  (zoom+! [camera amount]
+    (zoom! camera (math/mat-add (zoom camera) (math/scale-transform amount))))
 
   Fixture
   (alter-user-data*! [fixt f args]
