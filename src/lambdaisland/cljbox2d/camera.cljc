@@ -8,7 +8,8 @@
 (defprotocol ICamera
   (center [cam])
   (world->screen [cam vec])
-  (screen->world [cam vec]))
+  (screen->world [cam vec])
+  (zoom [cam]))
 
 (defrecord Camera [^Mat22 transform ^Vec2 center ^Vec2 extents]
   ICamera
@@ -17,7 +18,9 @@
   (world->screen [_ world]
     (math/vec-add (math/mat-mul transform (math/vec-sub world center)) extents))
   (screen->world [_ screen]
-    (math/vec-add (math/mat-mul (math/mat-invert transform) (math/vec-sub screen extents)) center)))
+    (math/vec-add (math/mat-mul (math/mat-invert transform) (math/vec-sub screen extents)) center))
+  (zoom [_]
+    transform))
 
 (defn camera [x y scale]
   (let [r (math/scale-transform scale)
@@ -37,5 +40,7 @@
   camera)
 
 (defn set-scale! [camera scale]
-  (.set (:transform camera) (math/scale-transform scale))
+  (case (type scale)
+    Mat22 (.set (:transform camera) scale)
+    (.set (:transform camera) (math/scale-transform scale)))
   camera)
